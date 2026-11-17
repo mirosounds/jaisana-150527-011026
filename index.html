@@ -495,57 +495,24 @@
 </div>
 <script>
 /* ============================================================
-   TRACKING v2 (Nov 2026) - shared "Miro Sounds Proposals" GA4 property,
-   one stream for all of go.mirosounds.com. Every event carries
-   proposal_name so reports split by proposal.
-   - Link-preview bots / headless browsers are not tracked.
-   - Rory's own devices are tagged traffic_type=internal (excluded by the
-     property's Active internal-traffic filter, alongside the IP rule).
+   GA4 Measurement ID: PLACEHOLDER -- dedicated property requested for
+   this proposal but not yet provisioned. Rory to supply the real
+   Measurement ID and swap it in below before this page goes out.
    ============================================================ */
-const GA_MEASUREMENT_ID = 'G-7X9YMF6YBP';
-const PROPOSAL_NAME = "Jai & Sana Wedding - Istanbul";
-const IS_BOT = (function(){
-  try { return navigator.webdriver === true || /bot|crawl|spider|slurp|headless|preview|facebookexternalhit|whatsapp|telegram|discord|slack|skype|linkedin|embedly|pinterest|bitly|outbrain|vkshare/i.test(navigator.userAgent || ''); } catch(e){ return false; }
-})();
-function isOwner(name, company){
-  return /^\s*rory\s+macinnes\s*$/i.test(name || '') || /miro\s*sounds/i.test(company || '');
-}
-const IS_INTERNAL = (function(){
-  try {
-    if (localStorage.getItem('miro_internal') === '1') return true;
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.indexOf('miro_lead_') === 0) {
-        const d = JSON.parse(localStorage.getItem(k) || '{}');
-        if (isOwner([d.firstName, d.lastName].filter(Boolean).join(' '), d.business)) { localStorage.setItem('miro_internal','1'); return true; }
-      }
-    }
-  } catch(e){}
-  return false;
-})();
+const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'; // TODO: swap for the real dedicated Measurement ID
 window.dataLayer = window.dataLayer || [];
 function gtag(){ dataLayer.push(arguments); }
-if (!IS_BOT) {
-  (function(){
-    const s = document.createElement('script');
-    s.async = true;
-    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
-    document.head.appendChild(s);
-  })();
-  gtag('js', new Date());
-  const cfg = { page_title: PROPOSAL_NAME, proposal_name: PROPOSAL_NAME };
-  if (IS_INTERNAL) cfg.traffic_type = 'internal';
-  gtag('config', GA_MEASUREMENT_ID, cfg);
-}
-function markOwnerDevice(name, company){
-  if (!isOwner(name, company)) return;
-  try { localStorage.setItem('miro_internal','1'); } catch(e){}
-  gtag('set', { traffic_type: 'internal' });
-}
+(function(){
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
+  document.head.appendChild(s);
+})();
+gtag('js', new Date());
+gtag('config', GA_MEASUREMENT_ID, { page_title: "Jai and Sana Wedding - Istanbul" });
 
 function trackEvent(name, params){
-  if (IS_BOT) return;
-  gtag('event', name, Object.assign({ proposal_name: PROPOSAL_NAME }, params || {}));
+  gtag('event', name, params);
 }
 
 /* ============================================================
@@ -597,9 +564,8 @@ function getVisitorName(){
     const business = document.getElementById('leadBusiness').value.trim();
     if (!firstName || !lastName || !business) return;
     try { localStorage.setItem(LEAD_STORAGE_KEY, JSON.stringify({firstName:firstName,lastName:lastName,business:business,ts:Date.now()})); } catch(err){}
-    markOwnerDevice([firstName, lastName].filter(Boolean).join(' '), business);
     trackEvent('lead_gate_submit', { business: business });
-    submitToEndpoint({ type:'lead_gate', proposal: PROPOSAL_NAME, first_name:firstName, last_name:lastName, business:business, ts:Date.now() });
+    submitToEndpoint({ type:'lead_gate', proposal:"Jai and Sana Wedding - Istanbul", first_name:firstName, last_name:lastName, business:business, ts:Date.now() });
     gate.style.display = 'none';
     document.body.style.overflow = '';
   });
@@ -647,6 +613,11 @@ const ARTISTS = [
     name:'Sophie Faith Band',
     moment:'Saturday 15th May - Sunset Cocktails',
     image: IMG_SOPHIE,
+    facadeStyle:'background-position:center 75%;',
+    videos:[
+      { label:'Bad Blood', yt:{id:'-LmM2Y7H3tU', start:33} },
+      { label:'Die 4 U', yt:{id:'qI16jR-e6Cs', start:93} }
+    ],
     desc:'A bespoke 60-90 minute performance of contemporary R&amp;B and soul, arranged and rehearsed specifically around your playlist.',
     fees:[
       ['Trio (Sophie + 2 musicians)', '£9,500'],
@@ -796,7 +767,7 @@ document.querySelectorAll('.rating-row').forEach(function(row){
 
   function sendRating(rating, comment){
     trackEvent('artist_rating', { artist_name: artistName, rating: rating, has_comment: !!comment });
-    submitToEndpoint({ type:'artist_rating', proposal: PROPOSAL_NAME, artist: artistName, rating: rating, comment: comment || '', visitor_name: getVisitorName(), ts: Date.now() });
+    submitToEndpoint({ type:'artist_rating', proposal:"Jai and Sana Wedding - Istanbul", artist: artistName, rating: rating, comment: comment || '', visitor_name: getVisitorName(), ts: Date.now() });
     thanks.style.display = 'block';
   }
 
